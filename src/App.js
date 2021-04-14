@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import {storage} from "./firebase/firebase";
+import React, { useState } from "react";
+import Button from 'react-bootstrap/Button';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const App = () => {
+
+  const [file, setFile] = useState(null);
+  const [url, setURL] = useState("");
+
+  function handleChange(e) {
+    setFile(e.target.file[0]);
+  }
+
+  function handleUpload(e) {
+    e.preventDefault();
+    const uploadTask = storage.ref(`/images/${file.name}`).put(file);
+    uploadTask.on("state_changed", console.log, console.error, () => {
+      storage
+        .ref("images")
+        .child(file.name)
+        .getDownloadURL()
+        .then((url) => {
+          setFile(null);
+          setURL(url);
+        });
+    });
+  }
+
+  function getImage(e){
+    const image = storage.ref("images").child()
+  }
+    
+    return (
+      <div className="App">
+          <form onSubmit={handleUpload}>
+            <input type="text"/> 
+            <input type="file" onChange={handleChange} />
+            <button disabled={!file}>upload to firebase</button>
+          </form>
+          <Button variant="primary">Get Images</Button>
+          <img src={url} alt="" />
+      </div>
+    );
 }
 
 export default App;
