@@ -54,11 +54,13 @@ const useStyles = makeStyles({
 
 const db = fb.firestore()
 
-const UploadForm = () => {
+const UploadForm = (props) => {
     const classes = useStyles();
     const [url, setURL] = useState(null);
     const [enabled, setEnabled] = useState(false);
     const [progress, setProgress] = useState(false);
+    const [post, setPosts] = useState([]) 
+    
     const handleChange= async (e) => {
         setProgress(true)
         const file = e.target.files[0]
@@ -89,14 +91,15 @@ const UploadForm = () => {
         setEnabled(true)
     }
     const date = Date.now()
-    db.collection("posts").add({
+    const newPost = {        
       text: text,
       img: url,
       dateAdded: date
-    })
+    }
+    // db.collection("posts").add(newPost);
+    props.addNewPost(newPost);
     document.getElementById('upload-form').reset();
     setURL(null);
-    document.getElementById('image-list').InnerHTML = ''
     return false;
   }
     const handleUploadClick = event => {      

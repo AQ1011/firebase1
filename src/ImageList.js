@@ -38,14 +38,9 @@ const useStyles = makeStyles({
 
 const db = fb.firestore()
 
-const ImageList = () => {
+const ImageList = (pros) => {
     
     const classes = useStyles();
-
-    const [posts, setPosts] = useState([]);
-    const [lastDoc, setLastDoc] = useState();
-    const [isEmpty, setIsEmpty] = useState(false)
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => { 
         db.collection('posts')
@@ -53,33 +48,22 @@ const ImageList = () => {
             .limit(10)
             .get()
             .then((collections)=> {
-                updateState(collections);
+                pros.updateState(collections);
             })
     },[])
-    const updateState = (collections) => {
-        if(!(collections.size === 0)) {
-            const p = collections.docs.map((post)=>post.data());
-            const lastDoc = collections.docs[collections.docs.length - 1];
-            setPosts(posts => [...posts,...p]);
-            setLastDoc(lastDoc);
-            setIsEmpty(false);
-            setLoading(false);
-        } else {
-            setIsEmpty(true);
-            setLoading(false);
-        }
-    }
+
     const fetchMore = () => {
-        setLoading(true);
+        pros.setLoading(true);
         db.collection('posts')
             .orderBy("dateAdded","desc")
-            .startAfter(lastDoc)
+            .startAfter(pros.lastDoc)
             .limit(10)
             .get()
             .then((collections) => {
-                updateState(collections)
+                pros.updateState(collections)
             })
     }
+
     const toTop = event =>{        
         window.scrollTo({
             top: 0,
@@ -88,16 +72,16 @@ const ImageList = () => {
     }
     return(
         <div id="image-list">
-                {posts.map(post => {
+                {pros.posts.map(post => {
                   return <Paper  className={classes.post} elevation={3}>
                     <img width="100%" src={post.img}/>
                     <Typography>{post.text}</Typography>
                     </Paper>
                 })}
                 <div className={classes.center}>                    
-                    {loading && <CircularProgress />}
-                    {!isEmpty && !loading && <Button className={classes.mybutton} onClick={fetchMore}>More</Button>}
-                    {isEmpty && <Typography>No</Typography>}
+                    {pros.loading && <CircularProgress />}
+                    {!pros.isEmpty && !pros.loading && <Button className={classes.mybutton} onClick={fetchMore}>More</Button>}
+                    {pros.isEmpty && <Typography>No</Typography>}
                 </div>
         </div>
     )
