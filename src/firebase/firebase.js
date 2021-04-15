@@ -12,13 +12,10 @@ const firebaseConfig = {
   };
 
   
-firebase.initializeApp(firebaseConfig);
+export const fb = firebase.initializeApp(firebaseConfig);
 
-const storage = firebase.storage()
+export const storage = firebase.storage()
 
 
-export  {
-storage, firebase as default
-}
  
  
