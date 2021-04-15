@@ -3,7 +3,7 @@ import 'firebase/firestore';
 import Grid from '@material-ui/core/Grid';
 import ImageList from './ImageList';
 import UploadForm from './UploadForm';
-
+import ToTop from './ToTop';
 
 const App = () => {
 
@@ -30,10 +30,12 @@ const App = () => {
     setPosts(posts => [post,...posts]);
   }
     return (
-      <div className="App" style={{backgroundColor: '#e3f2fd', minHeight: '100vh'}}>
-        <Grid container justify="space-between" >
-          <Grid item lg={3}/>
-          <Grid item lg={3} md={4}>
+      <div className="App" style={{backgroundColor: '#e3f2fd', minHeight: '100vh'}}> 
+      <ToTop/>
+        <Grid container justify="space-between" > 
+          <Grid item lg={2} />
+          <Grid item lg={4} md={3}>
+              <UploadForm addNewPost={addNewPost}/>
               <ImageList updateState = {updateState} 
                 lastDoc={lastDoc}
                 isEmpty={isEmpty}
@@ -41,9 +43,8 @@ const App = () => {
                 posts={posts}
                 setLoading={setLoading}/>
           </Grid>
-          <Grid item lg={3}>
-              <UploadForm addNewPost={addNewPost}/>
-          </Grid>
+          <Grid item lg={2}>
+          </Grid>   
         </Grid>          
       </div>
     );
