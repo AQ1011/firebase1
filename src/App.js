@@ -1,61 +1,42 @@
-import {storage, fb} from "./firebase/firebase";
+import {fb} from "./firebase/firebase";
 import React, { useState, useEffect } from "react";
-import Button from 'react-bootstrap/Button';
 import 'firebase/firestore';
+import Grid from '@material-ui/core/Grid';
+import ImageList from './ImageList';
+import UploadForm from './UploadForm';
+import { makeStyles } from '@material-ui/core/styles';
 
-const db = fb.firestore()
-
-const App = () => {
-
-  const [url, setURL] = useState(null);
+const App = () => {  
 
   const [posts, setPosts] = useState([]);
+  const [lastDoc, setLastDoc] = useState();
+  const [isEmpty, setIsEmpty] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleChange= async (e) => {
-    const file = e.target.files[0]
-    const storageRef = fb.storage().ref()
-    const fileRef = storageRef.child(file.name)
-    await fileRef.put(file)
-    setURL(await fileRef.getDownloadURL())
-  }
-
-  function handleUpload(e) {
-    e.preventDefault();
-    const text = e.target.text.value
-    if(!text) return;
-    db.collection("post").add({
-      text: text,
-      img: url
-    })
-    document.getElementById('imglist').innerHTML += '<li><img width="100" src="'+ url + '"><p>asyn load</p></li>'
-  }
-
-  useEffect(() => {
-    const getPost = async () => {
-      const postsCollection = await db.collection('post').get()
-      setPosts(postsCollection.docs.map(doc => {
-        return doc.data();
-      }))
+  const updateState = (collections) => {
+    if(!(collections.size === 0)) {
+        const p = collections.docs.map((post)=>post.data());
+        const lastDoc = collections.docs[collections.docs.length - 1];
+        setPosts(posts => [...posts,...p]);
+        setLastDoc(lastDoc);
+        setIsEmpty(false);
+        setLoading(false);
+    } else {
+        setIsEmpty(true);
+        setLoading(false);
     }
-    getPost()
-  },[])
-    
+}
     return (
-      <div className="App">
-          <form onSubmit={handleUpload}>
-            <input type="text" name="text"/> 
-            <input type="file" onChange={handleChange} />
-            <button >upload to firebase</button>
-          </form>
-          <img width="200" src={url} alt="" />
-          <ul id="imglist">
-            {posts.map(post => {
-              return <li key={post.id}>
-                <img width="100" src={post.img}/>
-                <p>{post.text}</p>
-                </li>
-            })}
-          </ul>
+      <div className="App" style={{backgroundColor: '#e3f2fd', minHeight: '100vh'}}>
+        <Grid container justify="space-between" >
+          <Grid item lg={3}/>
+          <Grid item lg={3} md={4}>
+              <ImageList />
+          </Grid>
+          <Grid item lg={3}>
+              <UploadForm />
+          </Grid>
+        </Grid>          
       </div>
     );
 }

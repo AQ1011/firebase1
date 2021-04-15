@@ -1,0 +1,133 @@
+import {storage, fb} from "./firebase/firebase";
+import React, { useState, useEffect,useRef } from "react";
+import Button from '@material-ui/core/Button';
+import 'firebase/firestore';
+import FormControl from '@material-ui/core/FormControl';
+
+import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate';
+import PublishIcon from '@material-ui/icons/Publish';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+const useStyles = makeStyles({    
+    form:{
+        padding: '32px',
+        marginTop: '16px',
+        marginBottom: '16px',
+        marginRight: '5vw',
+        backgroundColor: 'white',
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column'
+    },
+    post:{
+        padding: '10px',
+        marginTop: '16px',
+        marginBottom: '16px',
+        backgroundColor: 'white'
+    },
+    center:{
+        display: 'flex',
+        justifyContent: 'center',
+    },
+    mybutton: {
+        marginTop: '16px',
+        borderRadius: '99vw',
+        background: '#448aff',
+        color: 'white'
+    },
+    preview: {
+        marginTop: '16px',
+    },
+    root: {
+        background: 'linear-gradient(45deg, #448aff 30%, #448aff 90%)',
+        border: 0,  
+        color: 'white',
+        height: 30,
+        padding: '0 30px',
+        marginTop: '16px',
+      },
+});
+
+const db = fb.firestore()
+
+const UploadForm = () => {
+    const classes = useStyles();
+    const [url, setURL] = useState(null);
+    const [enabled, setEnabled] = useState(false);
+    const [progress, setProgress] = useState(false);
+    const handleChange= async (e) => {
+        setProgress(true)
+        const file = e.target.files[0]
+        const storageRef = fb.storage().ref()
+        const fileRef = storageRef.child(file.name)
+        await fileRef.put(file)
+        setURL(await fileRef.getDownloadURL())        
+        if(url == ''){
+            setEnabled(false)
+        } else {
+            setEnabled(true)
+            setProgress(false)
+        }
+        console.log('done')
+    }
+
+  function handleUpload(e) {
+    e.preventDefault();
+    const text = e.target.text.value
+    if(!text){
+      alert("Chưa nhập caption")
+      return;
+    }   
+    if(url == ''){
+        setEnabled(false)
+        return;
+    } else {
+        setEnabled(true)
+    }
+    const date = Date.now()
+    db.collection("posts").add({
+      text: text,
+      img: url,
+      dateAdded: date
+    })
+    document.getElementById('upload-form').reset();
+    setURL(null);
+    document.getElementById('image-list').InnerHTML = ''
+    return false;
+  }
+    const handleUploadClick = event => {      
+        document.getElementById('uploadbtn').click();
+    }
+    const handleChooseClick = event => {      
+        document.getElementById('choosebtn').click();
+    }
+
+    return(
+            <Paper elevation={3} className={classes.form}>                
+                <form id="upload-form" onSubmit={handleUpload} className={classes.center}>
+                <FormControl >
+                    <InputLabel width="100%">Caption</InputLabel>
+                    <Input id="caption" type="text" name="text"/>                 
+                </FormControl>
+                <input type="file" name="upload"
+                    id="choosebtn"
+                    accept="image/*"
+                    style={{display:'none'}} 
+                    onChange={handleChange}/>
+                <Input type="submit" 
+                    id="uploadbtn"
+                    style={{display:'none'}} />
+                </form>      
+                <Button onClick={handleChooseClick} className={classes.root}><AddPhotoAlternateIcon/></Button>
+                <Button onClick={handleUploadClick} disabled={!enabled} className={classes.root}>Upload</Button>
+                {progress && <LinearProgress progress={progress} style={{marginTop: '16px'}}/>}
+                <img id="preview-image" width="100%" className={classes.preview} src={url} alt="" />
+            </Paper>
+    )
+}
+
+export default UploadForm
