@@ -10,10 +10,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
-
 const useStyles = makeStyles({    
     form:{
         padding: '32px',
@@ -118,10 +114,11 @@ const UploadForm = (props) => {
       img: url,
       dateAdded: date
     }
-    db.collection("posts").add(newPost);
+    db.collection("postsec").add(newPost);
     props.addNewPost(newPost);
     document.getElementById('upload-form').reset();
     setURL(null);
+    setEnabled(false);
     return false;
   }
     const handleUploadClick = event => {      

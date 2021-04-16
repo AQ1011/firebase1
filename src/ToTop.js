@@ -15,8 +15,7 @@ const ToTop = () => {
             style={{position: 'fixed', 
             bottom: '5vh', 
             right: '10vw',
-            background: '#f44336',
-            borderRadius: '1000px'}}>
+            background: '#f44336'}}>
             <KeyboardArrowUpIcon/>
         </Button>
     )

@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import ImageList from './ImageList';
 import UploadForm from './UploadForm';
 import ToTop from './ToTop';
+import Slide from './Slide';
 
 const App = () => {
 
@@ -31,7 +32,9 @@ const App = () => {
   }
     return (
       <div className="App" style={{backgroundColor: '#e3f2fd', minHeight: '100vh'}}> 
-      <ToTop/>
+        <ToTop />
+        <Slide updateState={updateState}          
+                posts={posts}/>
         <Grid container justify="space-between" > 
           <Grid item lg={2} />
           <Grid item lg={4} md={3}>
